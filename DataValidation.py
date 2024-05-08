@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from pandas.plotting import autocorrelation_plot
 
 def DataValidation(data):
 
@@ -55,9 +56,15 @@ def DataValidation(data):
     plt.gcf().autofmt_xdate()
 
     ax.plot(data.index, data['Price_BE'], color='blue')
-    plt.show()
+    #plt.show()
 
     # Print maximum and minimum price
     print('\nPrice_BE:')
     print('Maximum price:', data['Price_BE'].max())
     print('Minimum price:', data['Price_BE'].min())
+    
+    # Plot a scatter matrix
+    #a = pd.plotting.scatter_matrix(data[['Price_BE', 'Load_FR','Gen_FR','Price_CH','Wind_BE','Solar_BE','Load_BE']], figsize=(10, 10))
+
+    # Plot a correlation matrix
+    # No idea
