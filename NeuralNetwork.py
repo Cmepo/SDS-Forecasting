@@ -44,18 +44,28 @@ def NeuralNetwork(data):
     model.add(Dense(32, activation='relu'))
     model.add(Dense(1, activation='linear'))
 
+    from tensorflow.keras.layers import LeakyReLU
 
-    rprop = RMSprop(learning_rate=0.01, rho=0.9, epsilon=1e-07)
+    # Create the model 
+    #model = Sequential()
+    #model.add(Dense(64, input_dim=X_train.shape[1]))
+    #model.add(LeakyReLU(negative_slope=0.5))  # Leaky ReLU activation with a small negative slope
+    #model.add(Dense(32))
+    #model.add(LeakyReLU(negative_slope=0.5))  # Leaky ReLU activation with a small negative slope
+    #model.add(Dense(1, activation='linear'))  # Linear activation for the output layer
+
+
+    rprop = RMSprop(learning_rate=0.005, rho=0.9, epsilon=1e-07)
     model.compile(loss='mean_squared_error', optimizer=rprop)
 
     # Fit the model
-    output_training = model.fit(X_train, y_train, epochs=10, batch_size=10, verbose=0)
+    output_training = model.fit(X_train, y_train, epochs=1000, batch_size=10, verbose=0)
     mse = output_training.history['loss'][-1]
     print('- mse is %.4f' % mse + ' @ ' + str(len(output_training.history['loss'])))
 
     predict_nn = model.predict(X_test)
     test_index = range(len(y_train), len(y_train) + len(y_test))
-    
+
     # Plot results for testing data
     plt.figure(figsize=(10, 5))
     plt.plot(test_index, y_test, color='blue', label='Actual Price (Testing)')
