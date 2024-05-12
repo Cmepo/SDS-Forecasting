@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
 
-def Forecast(data):
+def LinearForecast(data):
 
     # Split the data into training, validation, and test sets
     train, test = train_test_split(data, test_size=0.2, shuffle=False)
