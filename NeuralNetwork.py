@@ -30,42 +30,10 @@ def NeuralNetwork(data):
     data.index = pd.to_datetime(data.index)
     data.sort_index(inplace=True)
 
-    # Create a new column 'Price_BE_next_day' and shift 'Price_BE' by 1
-    # data['Price_BE_next_day'] = data['Price_BE'].shift(-1)
-    #data.dropna(inplace=True)
-    # Drop the last row
-    #data.drop(data.tail(1).index, inplace=True)
-
-    # Predict based on the last 7 days
-    #data['Price_BE_next_day'] = data['Price_BE']
-    
-    # Shift the data by 7 days
-
-
-
-    # Fill in nan values
-    #data.fillna(method='ffill', inplace=True)
-
-    # Drop nan values
-    #data_shifted.dropna(inplace=True)
-
-    # Split the data into features and target
-    #X = data_shifted[['Price_BE','Load_FR', 'Gen_FR','Price_CH' ,'Wind_BE', 'Solar_BE', 'Load_BE']]
-    #y = data_shifted['Price_BE_next_day']
-
-    # Assuming 'data' is your DataFrame with datetime index and all relevant features including 'Price_BE'
-    # Ensure 'data' contains all relevant features along with the target variable
 
     # List of features to include in the model
     features = ['Price_BE', 'Price_CH', 'Load_FR', 'Gen_FR', 'Wind_BE', 'Solar_BE', 'Load_BE']
 
-    # Create rolling window features for the last 7 days for all features
-    window_size = 7
-    for feature in features:
-        for i in range(1, window_size + 1):
-            data[f'{feature}_{i}'] = data[feature].shift(i)
-
-    # Prepare features and target
     X = data.drop(columns=features[0]).values  # Features excluding the target variable
     y = data['Price_BE'].values  # Target variable (price for the following day)
 
@@ -84,43 +52,9 @@ def NeuralNetwork(data):
         masked_pred = tf.boolean_mask(y_pred, mask)
         return MeanSquaredError()(masked_true, masked_pred)
     
-    # Split the data into training and testing sets
-
-    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
     # Validation data
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=0)
-
-    #print dimensions of X_train and y_train
-    #print(X_train.shape)
-    #print(y_train.shape)
-
-
-    # Create the model 
-    #def build_model(hp):
-    #    model = Sequential()
-    #    model.add(Dense(64, input_dim=X_train.shape[1], activation='relu'))
-    #    model.add(Dense(32, activation='relu'))
-    #    model.add(Dense(1, activation='linear'))
-    #    return model
-    
-    # Find best hyperparameters
-    #tuner = keras_tuner.RandomSearch(
-    #    build_model,
-    #    objective= 'val_loss',
-    #    max_trials=5,
-    #)
-
-    #tuner.search(X_train, y_train, epochs=100, validation_split=0.2)
-    #best_model = tuner.get_best_models()[0]
-        
-    # Create the model 
-    #model = Sequential()
-    #model.add(Dense(64, input_dim=X_train.shape[1]))
-    #model.add(LeakyReLU(negative_slope=0.5))  # Leaky ReLU activation with a small negative slope
-    #model.add(Dense(32))
-    #model.add(LeakyReLU(negative_slope=0.5))  # Leaky ReLU activation with a small negative slope
-    #model.add(Dense(1, activation='linear'))  # Linear activation for the output layer
 
 
     def build_model(hp):
@@ -162,16 +96,14 @@ def NeuralNetwork(data):
     best_model = models[0]
     best_model.summary()
 
-    # Fit the model
     output_training = best_model.fit(X_train, y_train, epochs=100, batch_size=16, verbose=1, validation_data=(X_val, y_val))
     mse = output_training.history['loss'][-1]
     print('- mse is %.4f' % mse + ' @ ' + str(len(output_training.history['loss'])))
 
     predict_nn = best_model.predict(X_test)
-    #get only one of the predictions
     predict_nn = predict_nn[:,0]
 
-    # Plot results for testing data
+    # Plot 
     test_index = range(len(y_train), len(y_train) + len(y_test))
     plt.figure(figsize=(10, 5))
     plt.plot(test_index, y_test, color='blue', label='Actual Price (Testing)')
@@ -184,25 +116,19 @@ def NeuralNetwork(data):
 
 
     # Predict the prices for the following dates:
-    # Relevant dates:
     # 23/01/2024, at 00:00, to 25/01/2024, at 23:00 (hourly data)
 
-    # Get the relevant dates
     start_date = '23/01/2024 00:00'
     end_date = '25/01/2024 23:00'
 
     # Filter the data for the relevant dates
     data_filtered = data.loc[start_date:end_date]
 
-    # Validate the data for the prediction
     print("\nSpecial values:")
-    print(data_filtered.isnull().sum())  # Count NaN values
-    print(data_filtered.isin([float('inf'), float('-inf')]).sum())  # Count infinity values
+    print(data_filtered.isnull().sum()) 
+    print(data_filtered.isin([float('inf'), float('-inf')]).sum()) 
 
-    # Drop the 'Price_BE_next_day' column
     data_filtered.drop('Price_BE_next_day', axis=1, inplace=True)
-
-    # Feature selection
     data_filtered = data_filtered[['Price_BE','Load_FR', 'Gen_FR','Price_CH' ,'Wind_BE', 'Solar_BE', 'Load_BE']]
 
     print(data_filtered)
@@ -222,12 +148,6 @@ def NeuralNetwork(data):
     plt.legend()
     plt.show()
 
-    # Index the predicted values with dates from the original dataset
-    predict_nn = pd.Series(predict_nn)
-    predict_nn.index = data.index[-len(predict_nn):]  # Assuming data contains date indices
-
-    # Print all values of the prediction
-    # Set display options to show all rows and columns
     pd.set_option('display.max_rows', None)
     pd.set_option('display.max_columns', None)
 

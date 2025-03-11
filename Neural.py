@@ -130,21 +130,21 @@ def Neural(data):
 
     print(predictions)
 
-    # Comparison dataframe from Comparison.csv
-    comparison = pd.read_csv('Comparison.csv')
-    print(comparison.columns)
-    # Get the day ahead prices from the column "Day Ahead Auction (BE)"
-    day_ahead_prices = comparison['Day Ahead Auction (BE)']
-    print(day_ahead_prices)
+    # # Comparison dataframe from Comparison.csv
+    # comparison = pd.read_csv('Comparison.csv')
+    # print(comparison.columns)
+    # # Get the day ahead prices from the column "Day Ahead Auction (BE)"
+    # day_ahead_prices = comparison['Day Ahead Auction (BE)']
+    # print(day_ahead_prices)
 
-    # plot the comparison
-    plt.figure(figsize=(12, 6))
-    plt.plot(predictions, label='Predicted')
-    plt.plot(day_ahead_prices, label='True')
-    plt.legend()
-    plt.show()
+    # # plot the comparison
+    # plt.figure(figsize=(12, 6))
+    # plt.plot(predictions, label='Predicted')
+    # plt.plot(day_ahead_prices, label='True')
+    # plt.legend()
+    # plt.show()
 
-    # Calculate the mean squared error between day ahead prices and predicted prices
-    mse = np.mean((day_ahead_prices - predictions.squeeze())**2)
-    print('Mean Squared Error:', mse)
+    # # Calculate the mean squared error between day ahead prices and predicted prices
+    # mse = np.mean((day_ahead_prices - predictions.squeeze())**2)
+    # print('Mean Squared Error:', mse)
 
